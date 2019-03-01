@@ -209,7 +209,6 @@ bool Ridge::fit(const Matrix<double, Dynamic, Dynamic> &X, const VectorXd &y){
     }
 
     VectorXd intercept_coef_ = VectorXd::Zero(X.cols() + 1);    
-    VectorXd intercept_coef_2 = VectorXd::Zero(X.cols() + 1);    
 
     double cost;
     double cost_last = 0;
@@ -226,8 +225,6 @@ bool Ridge::fit(const Matrix<double, Dynamic, Dynamic> &X, const VectorXd &y){
         
         cost = error.dot(error)/X_norm.rows();
 
-        // intercept_coef_2 = intercept_coef_;
-        // intercept_coef_2(0) = 0;
         grad = -2.0/X_norm.rows() * X_norm.transpose() * error + 2.0 * alpha * intercept_coef_;
 
         intercept_coef_ -= lr * grad;

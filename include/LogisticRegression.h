@@ -1,5 +1,5 @@
-#ifndef LINEAR_REGRESSION_H
-#define LINEAR_REGRESSION_H
+#ifndef LOGISTIC_REGRESSION_H
+#define LOGISTIC_REGRESSION_H
 
 #include <iostream>
 #include <fstream>
@@ -22,28 +22,26 @@ using namespace std;
 
 class LogisticRegression{
 private:
-    double min_error;
-    uint max_iter;
-    double learning_rate;
+    double intercept_;
+    VectorXd coef_; 
+    int error_flag_;
 public:
-    LogisticRegression();
+    double lr; 
+    uint max_iter;
+    double tol;    
+    bool normalize;
+
+    LogisticRegression(double lr=0.1, uint max_iter=10000, double tol=1e-9, bool normalize=true);
     ~LogisticRegression(){};
     bool fit(const Matrix<double, Dynamic, Dynamic> &X, const VectorXd &y);
     VectorXd predict(const Matrix<double, Dynamic, Dynamic> &X);
 
-    //bool fit(const vector<vector<double>> &X, const vector<double> &y);
-    //vector<double> predict(const vector<vector<double>> &X);
+    VectorXd sigmoid(const VectorXd &z);
+    double get_intercept(){return intercept_;}
+    VectorXd get_coef(){return coef_;}
 
-
-    //vector<double> get_params();
-    //score(X, y[, sample_weight]) 	Returns the coefficient of determination R^2 of the prediction.
-    //set_params(**params) 	Set the parameters of this estimator.
-    
-    //vector<double> coef_;
-    //double intercept_;
-    VectorXd intercept_coef_;
-
-    int error_flag_;
+    bool valid(const Matrix<double, Dynamic, Dynamic> &X, const VectorXd &y);
+    void read_data(ifstream & fid, int m, int n, Matrix<double, Dynamic, Dynamic> &X, VectorXd &y);
 };
 
 

@@ -9,13 +9,14 @@
 #include <stdlib.h>
 
 #include "LinearRegression.h"
+#include "LogisticRegression.h"
 
 using namespace std;
 
 
 void test_ridge();
 void test_lasso();
-
+void test_lr();
 
 int main(){
     srand((unsigned int)(time(NULL)));
@@ -90,19 +91,30 @@ int main(){
     // cout << "Eigen running time(sec): " << (double)(t11-t10)/CLOCKS_PER_SEC << endl;
 
     // test_ridge();
-    test_lasso();
-    // LinearRegression lr;
-    // vector<vector<double>> X {{1,1},{1,2},{2,2},{2,3}};
-    // vector<double> y{6,8,9,11};
-    // lr.fit(X, y);
-    // vector<double> x{3,5};
-    // cout << lr.predict(x) << endl;
-    // cout << lr.error_flag_ << endl;
-    // for(auto i:lr.coef_) cout << i << ',';
-    // cout << lr.intercept_ << endl;
+    //test_lasso();
+    test_lr();
+
+
+
     return 1;
 }
 
+void test_lr(){
+    LogisticRegression lr(0.001, 100000, 1e-3, false);
+    ifstream fid;
+    fid.open("../mytest/lrdata.txt");
+    int m,n;
+    fid >> m >> n;
+    m = 100;
+    Matrix<double, Dynamic, Dynamic> X=Matrix<double,Dynamic,Dynamic>::Zero(m,n);
+    VectorXd y=VectorXd::Zero(m);
+    lr.read_data(fid, m,n, X,y);
+    fid.close();
+
+    lr.fit(X,y);
+    cout << lr.get_coef() << endl << lr.get_intercept() << endl;
+    cout << lr.predict(X) - y << endl;
+}
 
 
 void test_ridge(){

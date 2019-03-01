@@ -25,5 +25,5 @@ set(CMAKE_CXX_FLAGS_RELEASE "-O2 -DNDEBUG " )   # release包优化
 #However, the file(GLOB...) allows for wildcard additions:
 
 #add_executable(findpath ${SOURCES})
-add_executable(mytest "mytest/mytest.cpp" "src/LinearRegression.cpp")
+add_executable(mytest "mytest/mytest.cpp" "src/LinearRegression.cpp" "src/LogisticRegression.cpp")
 #add_executable(distcheck "src/distance_check.cpp")
