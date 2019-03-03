@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.4)
 
 project(mlcode)
 
-find_package(Eigen3 REQUIRED)
+#find_package(Eigen3 REQUIRED)
 #Bring the headers, such as Student.h into the project
 include_directories(include)
 include_directories(${EIGEN3_INCLUDE_DIR})
@@ -25,5 +25,5 @@ set(CMAKE_CXX_FLAGS_RELEASE "-O2 -DNDEBUG " )   # release包优化
 #However, the file(GLOB...) allows for wildcard additions:
 
 #add_executable(findpath ${SOURCES})
-add_executable(mytest "mytest/mytest.cpp" "src/LinearRegression.cpp" "src/LogisticRegression.cpp")
-#add_executable(distcheck "src/distance_check.cpp")
+#add_executable(mytest "mytest/mytest.cpp" "src/LinearRegression.cpp" "src/LogisticRegression.cpp")
+add_executable(DTtest "mytest/DTtest.cpp" "src/DecisionTree.cpp")
