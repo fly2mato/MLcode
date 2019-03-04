@@ -19,13 +19,13 @@ class TreeNode{
 public:
     uint decision_feature;
     string ans;
-    vector<string> feature_values;
+    // vector<string> feature_values;
     vector<TreeNode*> child;
 
     TreeNode() {
         decision_feature=0;
         ans = "";
-        feature_values.clear();
+        // feature_values.clear();
         child.clear();
     }
 };

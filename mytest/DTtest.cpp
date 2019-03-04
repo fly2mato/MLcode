@@ -37,6 +37,7 @@ int main(){
     for(auto x:X){
         cout << DTs.predict(x) << endl;
     }
+    // cout << "predict: " << DTs.predict(X[0]) << endl;
     return 1;
 }
 

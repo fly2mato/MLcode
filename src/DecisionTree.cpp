@@ -54,10 +54,9 @@ void DecisionTree::buildTree(const vector<vector<string>>&X, const vector<string
     //计算H(D)
     double HD = 0;
     unordered_map<string, uint> count;
-    for(int i=0; i<sample_index.size(); ++i) count[y[sample_index[i]]]++;
+    for(uint i=0; i<sample_index.size(); ++i) count[y[sample_index[i]]]++;
     for(auto i : label_value){
         double p = count[i.first]*1.0/sample_index.size();
-        cout << i.first << ':' << count[i.first] << endl;
         if (p<1e-6) continue;
         HD -= p*log2(p);
     }
@@ -71,12 +70,11 @@ void DecisionTree::buildTree(const vector<vector<string>>&X, const vector<string
         }
     }
 
-    cout << '#' << depth << endl;
-    cout << HD << ',' << feature_index.size() << endl;
+    // cout << '#' << depth << ':' << max_y << ',' << max_count << endl;
+    // cout << HD << ',' << feature_index.size() << endl;
 
     if (feature_index.size()==0 || HD<1e-6){
         root->ans = max_y;
-        // cout << max_y << endl;
         return ;
     }
 
@@ -85,10 +83,9 @@ void DecisionTree::buildTree(const vector<vector<string>>&X, const vector<string
     double max_gDA = 0.0;
     uint max_feature = feature_index[0];
     for(auto j:feature_index){
-        
         //每个特征取值情况下，分别对label取值计数
-        vector<vector<uint>> c(feature_dim[feature_index[j]], vector<uint>(label_dim, 0));  
-        vector<uint> sumc(feature_dim[feature_index[j]], 0); //每个特征的取值情况，共有多少个样本       
+        vector<vector<uint>> c(feature_dim[j], vector<uint>(label_dim, 0));  
+        vector<uint> sumc(feature_dim[j], 0); //每个特征的取值情况，共有多少个样本       
         for(auto i:sample_index){
             int feature_x = feature_value[j][X[i][j]]; //第j个特征，在样本点上的取值，编码
             int label_y = label_value[y[i]]; //样本点的标签，编码
@@ -100,22 +97,18 @@ void DecisionTree::buildTree(const vector<vector<string>>&X, const vector<string
         double HAD = 0.0; //用于计算信息增益比 的 分母
         uint sum_i = 0;
 
-        cout << endl;
         for(auto a:c){
             double pa = sumc[sum_i]*1.0/sample_index.size();
-            cout << pa << ',';
             double HD_a = 0.0; //H(D|a)
             for(auto ay:a){
                 if (ay==0) continue;
-                HD_a -= ay*.10/sumc[sum_i] * log2(ay*1.0/sumc[sum_i]);
+                HD_a -= ay*1.0/sumc[sum_i] * log2(ay*1.0/sumc[sum_i]);
             }
             HDa += pa * HD_a;
             sum_i++; 
             if (pa<1e-6) continue;
             HAD -= pa*log2(pa);  
         }
-        //gDA.push_back((HD-HDa)/HAD); 
-        // cout << HDa << ',';
         gDA = (HD-HDa)/HAD;
         if (gDA > max_gDA) {
             max_gDA = gDA;
@@ -123,19 +116,16 @@ void DecisionTree::buildTree(const vector<vector<string>>&X, const vector<string
         } 
 
     }
-    cout << endl;
-
-    // cout << "decision: " << max_feature << endl;
-
     root->decision_feature = max_feature;
     vector<uint> next_feature_index;
     for(auto j: feature_index){
         if (j!= max_feature) next_feature_index.push_back(j);
     }
+    root->child.resize(feature_value[max_feature].size());
     for(auto a: feature_value[max_feature]){
         TreeNode * pt = new TreeNode;
-        root->feature_values.push_back(a.first);
-        root->child.push_back(pt);
+        // root->feature_values.push_back(a.first);
+        root->child[a.second] = pt;
 
         vector<uint> next_sample_index;
         for(auto i : sample_index){
@@ -147,7 +137,6 @@ void DecisionTree::buildTree(const vector<vector<string>>&X, const vector<string
             continue;
         }
 
-        // cout << "-> " << a.first << endl;
         buildTree(X, y, next_sample_index, next_feature_index, depth+1, pt);
     }
 
@@ -155,9 +144,7 @@ void DecisionTree::buildTree(const vector<vector<string>>&X, const vector<string
 
 string DecisionTree::predict(const vector<string>& x){
     TreeNode *pt = dt;
-    
     while(pt->ans==""){
-        // cout << pt->decision_feature << ',' << x[pt->decision_feature] << endl;
         pt = pt->child[feature_value[pt->decision_feature][x[pt->decision_feature]]];
     }
     return pt->ans;
