@@ -42,11 +42,11 @@ class DecisionTree(object):
         label_value = np.unique(y)
         
         #只有1个类别，
-        if len(label_value)==1:
-            return TreeNode(value=label_value[0])
+        #if len(label_value)==1:
+        #    return TreeNode(value=label_value[0])
         
         #最大深度、叶子节点上样本数量条件
-        if depth==self.max_depth or m<=self.min_samples_split:
+        if len(label_value)==1 or depth==self.max_depth or m<=self.min_samples_split:
             return TreeNode(value=self._leaf_calc_value(y))
 
         max_purity = None
@@ -58,8 +58,8 @@ class DecisionTree(object):
                 if sum(true_index)>0 and sum(false_index)>0:
                     ytrue = y[true_index]
                     yfalse = y[false_index]
-                    
-                    purity = self._purity_calc(y, X[:,i], ytrue, yfalse)
+
+                    purity = self._purity_calc(y, X, true_index, false_index)
                     if max_purity is None or purity>max_purity:
                         max_purity = purity
                         decision = {"feature_index":i, "threshold":threshold}
@@ -76,7 +76,7 @@ class DecisionTree(object):
         return node
         
     def predict(self, X):
-        return [self._predict(x) for x in X]
+        return np.array([self._predict(x) for x in X])
     
     def _predict(self, x):
         ptr = self.root
@@ -111,15 +111,19 @@ def calculate_gini(y):
 
 
 class ClassificationTree(DecisionTree):
-    def _calculate_information_gain(self, y, x, y1, y2):
+    def _calculate_information_gain(self, y, x, y1_index, y2_index):
         # Calculate information gain
+        y1 = y[y1_index]
+        y2 = y[y2_index]
         p = len(y1)/len(y)
         entropy = calculate_entropy(y)
         info_gain = entropy - p*calculate_entropy(y1)-(1-p)*calculate_entropy(y2)
         info_gain_rate = info_gain/calculate_entropy(x)
         return info_gain_rate
     
-    def _calculate_gini(self, y, x, y1, y2):
+    def _calculate_gini(self, y, x, y1_index, y2_index):
+        y1 = y[y1_index]
+        y2 = y[y2_index]
         p = len(y1)/len(y)
         Gyx = p*calculate_gini(y1) + (1-p)*calculate_gini(y2)
         return -Gyx
@@ -135,8 +139,10 @@ class ClassificationTree(DecisionTree):
         super(ClassificationTree, self).fit(X, y, feature_enable=None)
         
 class RegressionTree(DecisionTree):
-    def _calculate_square_error(self, y, x, y1, y2):
+    def _calculate_square_error(self, y, x, y1_index, y2_index):
         #print(y1,y2)
+        y1 = y[y1_index]
+        y2 = y[y2_index]
         S = np.std(y1)**2*len(y1) + np.std(y2)**2*len(y2)
         
         return -S
